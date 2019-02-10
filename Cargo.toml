@@ -1,0 +1,15 @@
+[package]
+name = "kritik"
+version = "0.1.0"
+authors = ["Jean Cavallo <jean.cavallo@hotmail.fr>"]
+edition = "2018"
+
+[dependencies]
+indicatif = "0.11"
+console = "<1.0"
+term_size = "<2"
+
+[dependencies.clap]
+version = "2"
+default-features = false
+features = ["suggestions", "color", "wrap_help"]
