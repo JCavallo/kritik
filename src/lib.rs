@@ -55,6 +55,21 @@ impl <'a> Kritik <'a> {
         self
     }
 
+    pub fn set_running_message(mut self, running_message: &'a str) -> Self {
+        self.running_text = running_message;
+        self
+    }
+
+    pub fn set_success_message(mut self, success_message: &'a str) -> Self {
+        self.success_text = success_message;
+        self
+    }
+
+    pub fn set_failure_message(mut self, failure_message: &'a str) -> Self {
+        self.failure_text = failure_message;
+        self
+    }
+
     pub fn return_exit_code(mut self) -> Self {
         self.behavior = FinalBehavior::ReturnCode;
         self
