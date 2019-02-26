@@ -12,12 +12,12 @@ fn main() {
         .return_exit_code()
         .run();
     Kritik::new()
-        .set_message("Hi!")
+        .set_message(String::from("Hi!"))
         .set_command(String::from("sleep 2 && git status"))
         .return_exit_code()
         .run();
     Kritik::new()
-        .set_message("Having fun...")
+        .set_message(String::from("Having fun..."))
         .showtime()
         .set_command(String::from("sleep 3 && azdqsdazdqs"))
         .return_exit_code()
@@ -27,7 +27,7 @@ fn main() {
         .return_exit_code()
         .run();
     Kritik::new()
-        .set_message("Final test...")
+        .set_message(String::from("Final test..."))
         .set_command(String::from("sleep 2 && azdqsdazzz"))
         .run();
 }
@@ -41,7 +41,7 @@ fn init_runner<'a>(matches: &'a ArgMatches) -> Kritik <'a> {
 
     let mut kritik = Kritik::new()
         .set_command(command_line)
-        .set_message(message);
+        .set_message(message.to_string());
 
     if showtime {
         kritik = kritik.showtime();

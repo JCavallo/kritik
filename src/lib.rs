@@ -16,7 +16,7 @@ pub struct Kritik <'a> {
     running_text: &'a str,
     success_text: &'a str,
     failure_text: &'a str,
-    message: &'a str,
+    message: String,
     command: String,
     progress_bar: ProgressBar,
     template: String,
@@ -32,7 +32,7 @@ impl <'a> Kritik <'a> {
             running_text: "RUNNING",
             success_text: "SUCCESS",
             failure_text: "FAILURE",
-            message: "",
+            message: String::from(""),
             command: String::from(""),
             progress_bar: progress_bar,
             template: "".to_string(),
@@ -50,7 +50,7 @@ impl <'a> Kritik <'a> {
         self
     }
 
-    pub fn set_message(mut self, message: &'a str) -> Self {
+    pub fn set_message(mut self, message: String) -> Self {
         self.message = message;
         self
     }
@@ -61,6 +61,9 @@ impl <'a> Kritik <'a> {
     }
 
     fn build_template(&mut self) {
+        if self.message.is_empty() {
+            self.message = self.command.clone();
+        }
         self.template.push_str("{spinner:.bold.cyan}");
         if self.showtime {
             self.template.push_str(" [{elapsed_precise:.bold}]");
@@ -75,7 +78,7 @@ impl <'a> Kritik <'a> {
         self.progress_bar.enable_steady_tick(50);
         self.progress_bar.set_style(
             ProgressStyle::default_spinner().template(&self.template));
-        self.progress_bar.set_message(self.message);
+        self.progress_bar.set_message(&self.message);
     }
 
     pub fn run(&mut self) -> i32 {
