@@ -1,3 +1,58 @@
+//! kritik is both a library and a binary to "nicely" run programs in the command line. It was
+//! inspired by `chronic`, which is included in the [moreutils](https://joeyh.name/code/moreutils/)
+//! tools, and "runs a command quietly unless it fails".
+//!
+//! * As a binary, it can be used in scripts to run commands, only showing the output if there is
+//! an error
+//! * This can also be used as a library if you want to use it from your own code
+//!
+//! It depends on [indicatif](https://docs.rs/indicatif) for displaying, and currently only targets
+//! `bash` on Linux.
+//!
+//! # Binary Usage
+//!
+//! Basic usage would be:
+//!
+//! ```
+//! kritik git pull
+//! ```
+//!
+//! It is possible to set a message that will be displayed while the command runs:
+//!
+//! ```
+//! kritik --message "Updating" git pull
+//! ```
+//!
+//! Chained commands can be called with quotes:
+//!
+//! ```
+//! kritik "git fetch -p origin && git merge origin/master"
+//! ```
+//!
+//! The output will be the message and a spinner while the command runs. The standard output /
+//! errors will only be shown if the commands exits with a non-zero error code.
+//!
+//! Available options can be listed with:
+//!
+//! ```
+//! kritik --help
+//! ```
+//!
+//! # Library Usage
+//!
+//! The library exposes the [`Kritik`](struct.Kritik.html) structure, which offers the same
+//! possibilities than the binary, but allows to control whether the program should exit or just
+//! manually manage the error codes.
+//!
+//! ```rust
+//! let mut kritik: Kritik = Default::default();
+//! kritik.set_command(String::from("ls /tmp && sleep 2"));
+//! kritik.set_message(String::from("Lsing tmp"));
+//! kritik.set_success_message("Everything went well");
+//! kritik.showtime();
+//! kritik.return_exit_code();
+//! let error_code = kritik.run();
+//! ```
 extern crate console;
 extern crate indicatif;
 
@@ -11,6 +66,7 @@ enum FinalBehavior {
     ReturnCode,
 }
 
+/// The structure that holds the configuration that will be run
 pub struct Kritik<'a> {
     showtime: bool,
     running_text: &'a str,
@@ -24,6 +80,14 @@ pub struct Kritik<'a> {
 }
 
 impl<'a> Default for Kritik<'a> {
+    /// The default configuration
+    ///
+    /// Default behavior is as follow:
+    /// * Text while running will be "RUNNING"
+    /// * Text in case of failure will be "FAILURE"
+    /// * Text in case of success will be "SUCCESS"
+    /// * Message while running will be the same as the command that was run
+    /// * In case of error, the process will exit, returning the command's error code
     fn default() -> Kritik<'a> {
         let showtime = false;
         let progress_bar = ProgressBar::new_spinner();
@@ -42,39 +106,41 @@ impl<'a> Default for Kritik<'a> {
 }
 
 impl<'a> Kritik<'a> {
-    pub fn set_command(mut self, command: String) -> Self {
+    /// Defines the command that will be ran
+    pub fn set_command(&mut self, command: String) {
         self.command = command;
-        self
     }
 
-    pub fn showtime(mut self) -> Self {
+    /// If called, the time since the command started will be displayed next to the message while
+    /// it is running
+    pub fn showtime(&mut self) {
         self.showtime = true;
-        self
     }
 
-    pub fn set_message(mut self, message: String) -> Self {
+    /// Defines the message that will be displayed while the command runs
+    pub fn set_message(&mut self, message: String) {
         self.message = message;
-        self
     }
 
-    pub fn set_running_message(mut self, running_message: &'a str) -> Self {
+    /// The status string for a running command. Ignored if ``showtime`` was called
+    pub fn set_running_message(&mut self, running_message: &'a str) {
         self.running_text = running_message;
-        self
     }
 
-    pub fn set_success_message(mut self, success_message: &'a str) -> Self {
+    /// The status string for a successful command
+    pub fn set_success_message(&mut self, success_message: &'a str) {
         self.success_text = success_message;
-        self
     }
 
-    pub fn set_failure_message(mut self, failure_message: &'a str) -> Self {
+    /// The status message for a failed command
+    pub fn set_failure_message(&mut self, failure_message: &'a str) {
         self.failure_text = failure_message;
-        self
     }
 
-    pub fn return_exit_code(mut self) -> Self {
+    /// If called, the process will returns the command's exit code rather than stopping the
+    /// program
+    pub fn return_exit_code(&mut self) {
         self.behavior = FinalBehavior::ReturnCode;
-        self
     }
 
     fn build_template(&mut self) {

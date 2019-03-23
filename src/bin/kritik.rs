@@ -18,22 +18,22 @@ fn init_runner<'a>(matches: &'a ArgMatches) -> Kritik<'a> {
 
     let mut kritik: Kritik = Default::default();
 
-    kritik = kritik.set_command(command_line);
+    kritik.set_command(command_line);
 
     if matches.is_present("message") {
-        kritik = kritik.set_message(matches.value_of("message").unwrap().to_string());
+        kritik.set_message(matches.value_of("message").unwrap().to_string());
     }
     if matches.is_present("running_message") {
-        kritik = kritik.set_running_message(matches.value_of("running_message").unwrap());
+        kritik.set_running_message(matches.value_of("running_message").unwrap());
     }
     if matches.is_present("success_message") {
-        kritik = kritik.set_success_message(matches.value_of("success_message").unwrap());
+        kritik.set_success_message(matches.value_of("success_message").unwrap());
     }
     if matches.is_present("failure_message") {
-        kritik = kritik.set_failure_message(matches.value_of("failure_message").unwrap());
+        kritik.set_failure_message(matches.value_of("failure_message").unwrap());
     }
     if showtime {
-        kritik = kritik.showtime();
+        kritik.showtime();
     }
     kritik
 }
