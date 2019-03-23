@@ -10,6 +10,9 @@ Basic usage would be for instance:
 
 `` kritik git pull ``
 
+<img src="https://github.com/JCavallo/kritik/blob/master/screenshots/basic.gif?raw=True">
+<img src="https://github.com/JCavallo/kritik/blob/master/screenshots/basic_error.gif?raw=True">
+
 It is possible to set a message that will be displayed while the command runs:
 
 `` kritik --message "Updating" git pull ``

@@ -38,6 +38,8 @@
 //! kritik --help
 //! ```
 //!
+//! Screenshots / gif can be seen in the [github README](https://github.com/jcavallo/kritik)
+//!
 //! # Library Usage
 //!
 //! The library exposes the [`Kritik`](struct.Kritik.html) structure, which offers the same
