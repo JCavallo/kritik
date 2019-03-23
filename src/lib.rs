@@ -1,17 +1,17 @@
 extern crate console;
 extern crate indicatif;
 
-use std::process::{self, Stdio, Command, Output};
+use std::process::{self, Command, Output, Stdio};
 
-use indicatif::{ProgressBar, ProgressStyle};
 use console::style;
+use indicatif::{ProgressBar, ProgressStyle};
 
 enum FinalBehavior {
     Exit,
     ReturnCode,
 }
 
-pub struct Kritik <'a> {
+pub struct Kritik<'a> {
     showtime: bool,
     running_text: &'a str,
     success_text: &'a str,
@@ -23,23 +23,25 @@ pub struct Kritik <'a> {
     behavior: FinalBehavior,
 }
 
-impl <'a> Kritik <'a> {
-    pub fn new() -> Self {
+impl<'a> Default for Kritik<'a> {
+    fn default() -> Kritik<'a> {
         let showtime = false;
         let progress_bar = ProgressBar::new_spinner();
         Self {
-            showtime: showtime,
+            showtime,
             running_text: "RUNNING",
             success_text: "SUCCESS",
             failure_text: "FAILURE",
             message: String::from(""),
             command: String::from(""),
-            progress_bar: progress_bar,
+            progress_bar,
             template: "".to_string(),
             behavior: FinalBehavior::Exit,
         }
     }
+}
 
+impl<'a> Kritik<'a> {
     pub fn set_command(mut self, command: String) -> Self {
         self.command = command;
         self
@@ -83,16 +85,16 @@ impl <'a> Kritik <'a> {
         if self.showtime {
             self.template.push_str(" [{elapsed_precise:.bold}]");
         } else {
-            self.template.push_str(
-                &format!(" [{}]", style(self.running_text).cyan().bold()));
+            self.template
+                .push_str(&format!(" [{}]", style(self.running_text).cyan().bold()));
         }
         self.template.push_str(" {wide_msg}");
     }
 
     fn build_spinner(&mut self) {
         self.progress_bar.enable_steady_tick(50);
-        self.progress_bar.set_style(
-            ProgressStyle::default_spinner().template(&self.template));
+        self.progress_bar
+            .set_style(ProgressStyle::default_spinner().template(&self.template));
         self.progress_bar.set_message(&self.message);
     }
 
@@ -108,9 +110,9 @@ impl <'a> Kritik <'a> {
         };
         let status_code = result.status.code().unwrap();
         match self.behavior {
-            FinalBehavior::ReturnCode => return status_code,
+            FinalBehavior::ReturnCode => status_code,
             FinalBehavior::Exit => process::exit(status_code),
-        };
+        }
     }
 
     fn execute_command(&self) -> Output {
@@ -123,15 +125,24 @@ impl <'a> Kritik <'a> {
     }
 
     fn handle_success(&self, output: &Output) {
-        println!("  [{}] {}", style(self.success_text).green().bold(),
-            self.message);
+        println!(
+            "  [{}] {}",
+            style(self.success_text).green().bold(),
+            self.message
+        );
     }
 
     fn handle_failure(&self, output: &Output) {
-        println!("  [{}] {}", style(self.failure_text).red().bold(),
-            self.message);
-        println!("  [{}] {}", style("ERROR CODE").red().bold(),
-            output.status.code().unwrap());
+        println!(
+            "  [{}] {}",
+            style(self.failure_text).red().bold(),
+            self.message
+        );
+        println!(
+            "  [{}] {}",
+            style("ERROR CODE").red().bold(),
+            output.status.code().unwrap()
+        );
         let stdout = String::from_utf8(output.stdout.clone()).unwrap();
         if stdout != "" {
             println!("  [{}]", style("STDOUT").white().bold());
