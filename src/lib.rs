@@ -27,7 +27,7 @@ impl<'a> Default for Kritik<'a> {
     fn default() -> Kritik<'a> {
         let showtime = false;
         let progress_bar = ProgressBar::new_spinner();
-        Self {
+        Kritik {
             showtime,
             running_text: "RUNNING",
             success_text: "SUCCESS",
