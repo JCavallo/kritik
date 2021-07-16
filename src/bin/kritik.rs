@@ -2,18 +2,29 @@ extern crate clap;
 extern crate kritik;
 
 use clap::{App, AppSettings, Arg, ArgMatches};
+use std::io;
+use std::process;
 
 use kritik::Kritik;
 use std::default::Default;
 
 fn main() {
     let matches = parse_command_line();
-    init_runner(&matches).run();
+    match init_runner(&matches) {
+        Ok(mut val) => val.run(),
+        Err(_) => {
+            println!("Missing command to run");
+            process::exit(1)
+        }
+    };
 }
 
-fn init_runner<'a>(matches: &'a ArgMatches) -> Kritik<'a> {
+fn init_runner<'a>(matches: &'a ArgMatches) -> Result<Kritik<'a>, io::Error> {
     let showtime = matches.is_present("showtime");
-    let command_args: Vec<&'a str> = matches.values_of("command").unwrap().collect();
+    let command_args: Vec<&'a str> = match matches.values_of("command") {
+        Some(v) => v.collect(),
+        None => return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "Missing command")),
+    };
     let command_line = command_args.join(" ");
 
     let mut kritik: Kritik = Default::default();
@@ -35,7 +46,7 @@ fn init_runner<'a>(matches: &'a ArgMatches) -> Kritik<'a> {
     if showtime {
         kritik.showtime();
     }
-    kritik
+    Ok(kritik)
 }
 
 fn parse_command_line<'a>() -> ArgMatches<'a> {
